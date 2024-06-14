@@ -9,12 +9,7 @@ typedef struct
     char vehicle_Agecode[2];
 
 } vehicle ;
-typedef struct 
-{
-    char email[100];
-    char password[100];
 
-} account ;
 typedef struct 
 {
     char fname[20];
@@ -23,10 +18,11 @@ typedef struct
     int DOBD;
     int DOBY;
     char gender;
+    char email[100];
     char password[100];
     long long int phn;
     long long int recovphn;
-} signUp;
+} account;
 
 void login();
 void addVehicle();

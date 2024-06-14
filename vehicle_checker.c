@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include "vehicle_checker.h"
+#include <string.h>
 int checkPassword(char pass[100]){
     int upperCase=0,symbols=0,numbers=0,letter=0;
     for(int i=0;pass[i]!='\0';i++){
@@ -37,8 +38,9 @@ int phnumberchecker(long long int ph){
         return 0;
     }
 }
+
 void login(){
-    FILE *log;
+    
     int choice;
     char useremail[100],password[100];
     ac:
@@ -48,14 +50,63 @@ void login(){
     switch (choice)
     {
     case 1:
+        printf("\t\tSign in\n");
+        account a;
+        FILE *sign_in;
+        sign_in=fopen("acc.txt","r");
+        fread(&a,sizeof(a),1,sign_in);
+        rem:
         printf("Enter E-mail: ");
         scanf("%s", useremail);
         printf("Enter Password:");
         scanf("%s", password);
+        int c;
+        if(strcmp(useremail,a.email)!=0&&strcmp(password,a.password)!=0){
+            printf("Incorrect email or password.\n");
+            printf("1.Forgot Password?\t\t2.Try again\n3.Cancel\n");
+            printf("Enter Your choice: ");
+            scanf("%d", &c);
+            switch (c)
+            {
+            case 1:
+            printf("\t\tRecovery Mode");
+            long long int recphn;
+            char newp[100],confp[100];
+                printf("Enter Recovery Phone number: ");
+                scanf("%lld",recphn);
+                if(a.recovphn==recphn){
+                    new:
+                    printf("Enter New Password: ");
+                    scanf("%s",newp);
+                    printf("Confirm password: ");
+                    scanf("%s",confp);
+                    if(strcmp(newp,confp)==0){
+                        if(checkPassword(confp)==0){
+                            printf("Please Use letter,UpperCase, symbols and numbers.Try Again: ");
+                            goto new;
+                        }
+                    }
+                }
+                break;
+                case 2:
+                goto rem;
+                break;
+                case 3:
+                goto ac;
+                break;
+            
+            default:
+                break;
+            }
+
+
+        }
         break;
     case 2:
-        printf("\t\tNew Account\n");
-        signUp s;
+    printf("\t\tNew Account\n");
+    FILE *new=fopen("acc.txt","a");
+        
+        account s;
         printf("First Name:");
         scanf("%s", s.fname);
         printf("Last Name: ");
@@ -86,10 +137,13 @@ void login(){
         gen:
         printf("Enter your gender: ");
         scanf("%s",&s.gender);
+        printf("%c",s.gender);
         if(s.gender!='m'&&s.gender!='f'&&s.gender!='o'){
             printf("Incorrect format Please try again.");
             goto gen;
         }
+        printf("Create an e-mail: ");
+        scanf("%s",s.email);
         printf("Create a Strong password Using letter,UpperCase, symbols and numbers: ");
         repass:
         scanf("%s",s.password);
@@ -108,13 +162,17 @@ void login(){
         recovph:
         scanf("%lld",&s.recovphn);
         if(phnumberchecker(s.recovphn)==0){
-            printf("Incorrect Format.Please Try Again:+977 ");
+            printf("Incorrect Format.Please Re-enter:+977 ");
             goto recovph;
         }
+        fwrite(&s,sizeof(a),1,new);
+        printf("Create Successfully.");
         break;
     default:
-        printf("Incorrect option.Try Again.\n");
+        printf("Incorrect option.Re-Enter your choice.\n");
         goto ac;
+        
+        
         break;
 }
 }
