@@ -86,6 +86,7 @@ void login(){
                             goto new;
                         }
                     }
+                    printf("Login Successfully.\n");
                 }
                 break;
                 case 2:
@@ -104,7 +105,7 @@ void login(){
         break;
     case 2:
     printf("\t\tNew Account\n");
-    FILE *new=fopen("acc.txt","a");
+    FILE *new=fopen("acc.txt","ab");
         
         account s;
         printf("First Name:");
@@ -113,7 +114,7 @@ void login(){
         scanf("%s",s.lname);
         printf("Date of Birth info \n");
         printf("Year(1963-2024): ");
-        yr:
+        yr: ;
         scanf("%d",&s.DOBY);
         if(s.DOBY<1963||s.DOBY>2024){
             printf("Incorrect fromat. Please re-enter(1963-2024): ");
@@ -127,14 +128,14 @@ void login(){
             goto mo;
         }
         printf("Date: ");
-        dt:
+        dt: ;
         scanf("%d",&s.DOBD);
         if(s.DOBD>30){
             printf("Incorrect fromat. Please re-enter(0-30): ");
             goto dt;
         }
         printf("Gender(m for Male, f for Female ,o for others):\n");
-        gen:
+        gen: ;
         printf("Enter your gender: ");
         scanf("%s",&s.gender);
         printf("%c",s.gender);
@@ -145,7 +146,7 @@ void login(){
         printf("Create an e-mail: ");
         scanf("%s",s.email);
         printf("Create a Strong password Using letter,UpperCase, symbols and numbers: ");
-        repass:
+        repass: ;
         scanf("%s",s.password);
         if(checkPassword(s.password)==0){
             printf("Please Use letter,UpperCase, symbols and numbers.Try Again: ");
@@ -159,14 +160,14 @@ void login(){
             goto reph;
         }
         printf("Enter Recovery Phone Number:+977 ");
-        recovph:
+        recovph: ;
         scanf("%lld",&s.recovphn);
         if(phnumberchecker(s.recovphn)==0){
             printf("Incorrect Format.Please Re-enter:+977 ");
             goto recovph;
         }
         fwrite(&s,sizeof(a),1,new);
-        printf("Create Successfully.");
+        printf("Create Successfully.\n");
         break;
     default:
         printf("Incorrect option.Re-Enter your choice.\n");
@@ -180,15 +181,59 @@ void login(){
 
 void addVehicle(){
     vehicle v;
-    FILE *fptr;
-    fptr=fopen("vehicle.txt","a");
-    printf("Enter Registration number Details: \n");
-    printf("Enter Vehicle type(A-K): ");
-    scanf("%c",&v.vehicleType);
-    printf("Enter state name: ");
-    scanf("%s",v.state);
-    printf("Enter Vehicle Age Code: ");
-    scanf("%d",&v.vehicle_Agecode);
+    FILE *addv;
+    addv=fopen("vehicle.txt","a");
+    char add='y';
+    char confirm='y';
+    while(add=='y'){
+        //  while(confirm=='y'){
+                printf("\t\tRegistration Details\n");
+                printf("\n");
+                printf("Enter Registration number: ");
+                scanf("%d",&v.registrationNumber);
+                printf("Enter Vehicle type(A-K): ");
+                scanf(" %c",&v.vehicleType);
+                printf("Enter Vehicle model: ");
+                scanf("%s",v.modelName);
+                printf("Enter Year of Manufacture: ");
+                scanf("%d",&v.year);
+                printf("Enter Last Name: ");
+                scanf("%s",v.name);
+                printf("Enter state name: ");
+                scanf("%s",v.state);
+                
+                
+                
+            // }
+    printf("Adding Please Wait\n");
+    printf("Successfully Added.\n");
+    printf("Do you Want to Add Another Vehicle(y/n): ");
+    scanf(" %c" ,&add);
+    fwrite(&v,sizeof(vehicle),1,addv);
+    
+    }
+    fclose(addv);
+}
+void updateVehicle(){
+    int regNum;
+    vehicle v;
+    FILE *updatev;
+    updatev=fopen("vehicle.txt","r");
+    printf("Enter your Registration Number: ");
+    scanf("%d",&regNum);
+    
+    while (fread(&v,sizeof(vehicle),1,updatev))
+    {
+        if(v.registrationNumber==regNum){
+        printf("\t\tYour Details\n");
+        printf("Registration Number:%d\n",v.registrationNumber);
+        printf("Owner Name: %s\n",v.name);
+        printf("Vehicle Type: %c\n",v.vehicleType);
+        printf("State:%s\n",v.state);
+        printf("Model:%s\n",v.modelName);
+        printf("Year of Manufacture:%d\n",v.year);
+        }
+    }
 }
 
 

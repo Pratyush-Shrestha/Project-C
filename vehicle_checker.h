@@ -1,12 +1,12 @@
 typedef struct 
 {
-    char modelName[50];
-    int year;
-    char Owner[50];
     int registrationNumber;
     char vehicleType;
+    char modelName[50];
+    char name[50];
+    int year;
     char state[10];
-    char vehicle_Agecode[2];
+    
 
 } vehicle ;
 
@@ -26,6 +26,6 @@ typedef struct
 
 void login();
 void addVehicle();
-// void updateVehicle();
+void updateVehicle();
 // void deleteVehicle();
 // void checkVehicle();
