@@ -38,30 +38,26 @@ int phnumberchecker(long long int ph){
         return 0;
     }
 }
-
+char user[50],pass[50];
 void login(){
-    
-    int choice;
-    char useremail[100],password[100];
-    ac:
-    printf("1.Login\t\t2.Sign up\n");
-    printf("Enter Choice: ");
-    scanf("%d",&choice);
-    switch (choice)
-    {
-    case 1:
-        printf("\t\tSign in\n");
+         printf("\t\tSign in\n");
+        char useremail[100],password[100];
         account a;
-        FILE *sign_in;
-        sign_in=fopen("acc.txt","r");
-        fread(&a,sizeof(a),1,sign_in);
+        FILE *sign;
+        sign=fopen("acc.DAT","r");
         rem:
         printf("Enter E-mail: ");
         scanf("%s", useremail);
         printf("Enter Password:");
         scanf("%s", password);
-        int c;
-        if(strcmp(useremail,a.email)!=0&&strcmp(password,a.password)!=0){
+        if(sign==NULL){
+            printf("Error Opening File.");
+        }
+        rewind(sign);
+        while(fread(&a,sizeof(account),1,sign)==1){
+            
+            int c;
+            if(strcmp(useremail,a.email)!=0&&strcmp(password,a.password)!=0){
             printf("Incorrect email or password.\n");
             printf("1.Forgot Password?\t\t2.Try again\n3.Cancel\n");
             printf("Enter Your choice: ");
@@ -72,6 +68,7 @@ void login(){
             printf("\t\tRecovery Mode");
             long long int recphn;
             char newp[100],confp[100];
+
                 printf("Enter Recovery Phone number: ");
                 scanf("%lld",recphn);
                 if(a.recovphn==recphn){
@@ -93,7 +90,7 @@ void login(){
                 goto rem;
                 break;
                 case 3:
-                goto ac;
+                Account();
                 break;
             
             default:
@@ -102,22 +99,27 @@ void login(){
 
 
         }
-        break;
-    case 2:
-    printf("\t\tNew Account\n");
-    FILE *new=fopen("acc.txt","ab");
+        else{
+            printf("Login Succesfully\n");
+        }
         
+        }
+}
+void signup(){
+        printf("\t\tNew Account\n");
         account s;
+        FILE *sig;
+        sig=fopen("acc.DAT","a");
         printf("First Name:");
         scanf("%s", s.fname);
         printf("Last Name: ");
         scanf("%s",s.lname);
         printf("Date of Birth info \n");
         printf("Year(1963-2024): ");
-        yr: ;
+        yr: 
         scanf("%d",&s.DOBY);
         if(s.DOBY<1963||s.DOBY>2024){
-            printf("Incorrect fromat. Please re-enter(1963-2024): ");
+            printf("Incorrect format. Please re-enter(1963-2024): ");
             goto yr;
         }
         printf("Month: ");
@@ -166,16 +168,34 @@ void login(){
             printf("Incorrect Format.Please Re-enter:+977 ");
             goto recovph;
         }
-        fwrite(&s,sizeof(a),1,new);
+        fwrite(&s,sizeof(account),1,sig);
         printf("Create Successfully.\n");
+        
+}
+
+void Account(){
+    int choice;
+    rechoice:
+    printf("1.Sign Up\t\t2.Login\n");
+    printf("Enter Choice: ");
+    scanf("%d",&choice);
+    switch (choice)
+    {
+    case 1:
+        signup();
         break;
+    case 2:
+    login();
+   break;
     default:
         printf("Incorrect option.Re-Enter your choice.\n");
-        goto ac;
-        
-        
+        goto rechoice;
         break;
 }
+}
+void accountDetail(){
+    printf("\t\tAccount Detail");
+    
 }
 
 
@@ -197,8 +217,10 @@ void addVehicle(){
                 scanf("%s",v.modelName);
                 printf("Enter Year of Manufacture: ");
                 scanf("%d",&v.year);
+                printf("Enter First Name: ");
+                scanf("%s",v.ofname);
                 printf("Enter Last Name: ");
-                scanf("%s",v.name);
+                scanf("%s",v.olname);
                 printf("Enter state name: ");
                 scanf("%s",v.state);
                 
@@ -214,7 +236,7 @@ void addVehicle(){
     }
     fclose(addv);
 }
-void updateVehicle(){
+void checkVehicle(){
     int regNum;
     vehicle v;
     FILE *updatev;
@@ -227,13 +249,161 @@ void updateVehicle(){
         if(v.registrationNumber==regNum){
         printf("\t\tYour Details\n");
         printf("Registration Number:%d\n",v.registrationNumber);
-        printf("Owner Name: %s\n",v.name);
+        printf("Owner Name: %s %s\n",v.ofname,v.olname);
         printf("Vehicle Type: %c\n",v.vehicleType);
         printf("State:%s\n",v.state);
         printf("Model:%s\n",v.modelName);
         printf("Year of Manufacture:%d\n",v.year);
         }
+        else{
+            printf("No any vehicle Registered in this number.\n");
+            break;
+        }
     }
 }
+void updateVehicle(){
+    FILE *upd;
+    upd=fopen("vehicle.txt","r");
+    vehicle vehicles[100];
+    int reg,choice;
+    int num=0;
+    int found=0;
+    char oldfname[50];
+    char oldlname[50];
+    printf("Enter Your Registration Number: ");
+    scanf("%d",&reg);
+    
+    while (fread(&vehicles[num],sizeof(vehicle),1,upd)){
+        
+        printf("%d\n",vehicles[num].registrationNumber);
+        if(vehicles[num].registrationNumber==reg){
+            
+            found=1;
+            char omodel[100];
+            change:
+            printf("\t\tWhat Do You Want To Change?");
+            printf("\n");
+            printf("1.Owner \t\t 2.Model\n");
+            printf("3.Go Back");
+            printf("Enter Your Choice: ");
+            scanf("%d",&choice);
+            switch (choice)
+            {
+            case 1:
+            re:
+                printf("Previous Owner \n");
+                printf("Enter first Name: ");
+                scanf("%s",oldfname);
+                printf("Enter Last Name:");
+                scanf("%s",oldlname);
+                if(strcmp(oldfname,vehicles[num].ofname)==0&&strcmp(oldlname,vehicles[num].olname)==0){
+                printf("New Owner\n");
+                printf("Enter First Name:");
+                scanf("%s",vehicles[num].ofname);
+                printf("Enter Last Name:");
+                scanf("%s",vehicles[num].olname);
+                }
+                else{
+                    printf("Incorrect Name.Try Again\n");
+                    goto re;
+                }
+                
+                break;
+                case 2:
+                   model:           
+                
+                printf("Enter Previous Model Name: ");
+                scanf("%s",omodel);
+                if(strcmp(omodel,vehicles[num].modelName)==0){
+                    printf("Enter New Model: ");
+                    scanf("%s",vehicles[num].modelName);
+                    printf("Enter Year of Manufacture: ");
+                    scanf("%d",&vehicles[num].year);
+                    printf("Enter Vehicle TYpe: ");
+                    scanf(" %c",&vehicles[num].vehicleType);
+                    printf("Enter State: ");
+                    scanf("%s",vehicles[num].state);
+                }
+                else{
+                    printf("Invalid.Try Again.\n");
+                    goto model;
+                }
+                break;
+               
+
+                
+            
+            default:
+            printf("Invalid option Try Again.\n");
+            goto change;
+                break;
+            }
+        }
+            
+        num++;
+    }
+    if(!found){
+        printf("No file\n");
+    }
+    fclose(upd);
+    upd=fopen("vehicle.txt","w");
+    int i;
+    if(!upd){
+        printf("Couldnot open.");
+    }
+    for(i=0;i<num;i++){
+        fwrite(&vehicles[i],sizeof(vehicle),1,upd);
+    }
+    fclose(upd);
+    printf("Changed Successfully");
+       
+    }
+    void deleteVehicle(){
+        FILE *delv;
+        int num=0;
+        char choice=' ';
+        delv=fopen("vehicle.txt","r+");
+        vehicle vehicles[100];
+        int reg;
+        printf("Enter Your Registration number to delete:");
+        scanf("%d", &reg);
+        while(fread(&vehicles[num],sizeof(vehicle),1,delv)){
+            if(vehicles[num].registrationNumber==reg){
+                printf("\t\tYour Details\n\n");
+                printf("Owner Name:%s %s\n",vehicles[num].ofname,vehicles[num].olname);
+                printf("Regeistration Number:%d\n",vehicles[num].registrationNumber);
+                printf("Vehicle Type:%c\n",vehicles[num].vehicleType);
+                printf("Year of Manufacture:%d\n",vehicles[num].year);
+                printf("Model:%s\n",vehicles[num].modelName);
+                del:
+                printf("Are You Sure You Want to delete?(y/n): ");
+                scanf(" %c",&choice);
+                if(choice=='y'){
+                    num-=1;
+                }
+                // else if(choice=='n'){
+
+                // }
+                else{
+                    printf("Please Input the valid choice.\n");
+                    goto del;
+                }
+            }
+            num++;
+        }
+        fclose(delv);
+        delv=fopen("vehicle.txt","w");
+        if(delv==NULL){
+            printf("Error Opening File.");
+
+        }
+        for(int i=0;i<num;i++){
+            fwrite(&vehicles[i],sizeof(vehicles),1,delv);
+        }
+        
+
+
+    }
+
 
 

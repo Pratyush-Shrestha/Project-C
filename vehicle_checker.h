@@ -3,7 +3,8 @@ typedef struct
     int registrationNumber;
     char vehicleType;
     char modelName[50];
-    char name[50];
+    char ofname[50];
+    char olname[50];
     int year;
     char state[10];
     
@@ -24,8 +25,9 @@ typedef struct
     long long int recovphn;
 } account;
 
-void login();
+void Account();
 void addVehicle();
 void updateVehicle();
-// void deleteVehicle();
-// void checkVehicle();
+void deleteVehicle();
+void checkVehicle();
+void accountDetail();
