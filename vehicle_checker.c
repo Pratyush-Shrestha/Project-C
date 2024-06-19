@@ -2,6 +2,47 @@
 #include<stdlib.h>
 #include "vehicle_checker.h"
 #include <string.h>
+void menu(){
+    int choice;
+     rechoice:
+    while(1){
+    printf("\t\tWelcome to Vehicle Registration\n");
+    printf("1.Add Vehicle    \t\t 2.Update Vehicle\n");
+    printf("3.Remove Vehicle \t\t 4.Check Vehicle Status\n");
+    printf("5.Log out        \t\t 6.Account Details\n");
+    printf("7.Exit\n");
+    printf("Enter Your Choice: ");
+    scanf("%d",&choice);
+    switch (choice)
+    {
+    case 1:
+    addVehicle();
+    break;
+    case 2:
+    updateVehicle();
+    break;
+    case 3:
+    deleteVehicle();
+    break;
+    case 4:
+    checkVehicle();
+    break;
+    case 5:
+    Account();
+    break;
+    case 6:
+
+    case 7:
+    exit(0);
+    break;
+
+    default:
+    printf("Invalid option Try Again.");
+    goto rechoice;
+    break;
+}
+}
+}
 int checkPassword(char pass[100]){
     int upperCase=0,symbols=0,numbers=0,letter=0;
     for(int i=0;pass[i]!='\0';i++){
@@ -42,9 +83,10 @@ char user[50],pass[50];
 void login(){
          printf("\t\tSign in\n");
         char useremail[100],password[100];
+        int count=0;
         account a;
         FILE *sign;
-        sign=fopen("acc.DAT","r");
+        sign=fopen("acc.txt","r");
         rem:
         printf("Enter E-mail: ");
         scanf("%s", useremail);
@@ -54,36 +96,69 @@ void login(){
             printf("Error Opening File.");
         }
         rewind(sign);
-        while(fread(&a,sizeof(account),1,sign)==1){
+        while(fread(&a,sizeof(account),1,sign)){
             
-            int c;
-            if(strcmp(useremail,a.email)!=0&&strcmp(password,a.password)!=0){
+            
+            if(strcmp(useremail,a.email)==0&&strcmp(password,a.password)==0){
+                count++;
+                printf("Login Succesfully\n");
+                break;
+
+        }
+        
+        
+        }
+        int c;
+        if(count==0){
             printf("Incorrect email or password.\n");
+            recov:
             printf("1.Forgot Password?\t\t2.Try again\n3.Cancel\n");
             printf("Enter Your choice: ");
             scanf("%d", &c);
             switch (c)
             {
             case 1:
-            printf("\t\tRecovery Mode");
+            printf("\t\tRecovery Mode\n\n");
+            account recovery[100];
             long long int recphn;
             char newp[100],confp[100];
-
+            int found=0;
+            int rec=0;
                 printf("Enter Recovery Phone number: ");
-                scanf("%lld",recphn);
-                if(a.recovphn==recphn){
+                scanf("%lld",&recphn);
+               rewind(sign);
+                while(fread(&recovery[rec],sizeof(account),1,sign)){
+                 if(recovery[rec].recovphn==recphn){
+                    found=1;
                     new:
+                    printf("%s\n",recovery[rec].password);
                     printf("Enter New Password: ");
                     scanf("%s",newp);
                     printf("Confirm password: ");
                     scanf("%s",confp);
+                    strcpy(recovery[rec].password,confp);
                     if(strcmp(newp,confp)==0){
                         if(checkPassword(confp)==0){
                             printf("Please Use letter,UpperCase, symbols and numbers.Try Again: ");
                             goto new;
                         }
-                    }
-                    printf("Login Successfully.\n");
+                        
+                        }
+                    } 
+                    rec++;
+                }
+                fclose(sign);
+                sign=fopen("vehicle.txt","w");
+                for(int i=0;i<rec;i++){
+                    fwrite(&recovery[i],sizeof(account),1,sign);
+                }   
+                if(!found){
+                    printf("This Recovery PH number Doesnot Exist.\n");
+                    Account();
+                }
+                else{
+                  printf("Succesfully Changed.\nPlease Login to continue...\n\n");
+                Account();  
                 }
                 break;
                 case 2:
@@ -94,22 +169,21 @@ void login(){
                 break;
             
             default:
+            printf("Invalid option. PLease Try Again.\n");
+            goto recov;
                 break;
+                }
+                
+                
             }
+            
+        }
 
-
-        }
-        else{
-            printf("Login Succesfully\n");
-        }
-        
-        }
-}
 void signup(){
         printf("\t\tNew Account\n");
         account s;
         FILE *sig;
-        sig=fopen("acc.DAT","a");
+        sig=fopen("acc.txt","a");
         printf("First Name:");
         scanf("%s", s.fname);
         printf("Last Name: ");
@@ -197,16 +271,15 @@ void accountDetail(){
     printf("\t\tAccount Detail");
     
 }
-
-
 void addVehicle(){
     vehicle v;
     FILE *addv;
-    addv=fopen("vehicle.txt","a");
+    addv=fopen("vehicle.txt","a");  
     char add='y';
     char confirm='y';
     while(add=='y'){
         //  while(confirm=='y'){
+                reg:
                 printf("\t\tRegistration Details\n");
                 printf("\n");
                 printf("Enter Registration number: ");
@@ -223,9 +296,15 @@ void addVehicle(){
                 scanf("%s",v.olname);
                 printf("Enter state name: ");
                 scanf("%s",v.state);
-                
-                
-                
+                vehicle check;
+                FILE *checker;
+                checker=fopen("vehicle.txt","r");
+                while(fread(&check,sizeof(vehicle),1,checker)){
+                    if(v.registrationNumber==check.registrationNumber){
+                        printf("The Number %d has been already registered. Please Input a Valid Number.",v.registrationNumber);
+                        goto reg;
+                    }  
+                }  
             // }
     printf("Adding Please Wait\n");
     printf("Successfully Added.\n");

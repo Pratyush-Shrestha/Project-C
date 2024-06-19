@@ -31,3 +31,4 @@ void updateVehicle();
 void deleteVehicle();
 void checkVehicle();
 void accountDetail();
+void menu();
