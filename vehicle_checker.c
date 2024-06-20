@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include "vehicle_checker.h"
 #include <string.h>
+char email[50];
 void menu(){
     int choice;
      rechoice:
@@ -31,7 +32,8 @@ void menu(){
     Account();
     break;
     case 6:
-
+    accountDetail();
+    break;
     case 7:
     exit(0);
     break;
@@ -97,16 +99,12 @@ void login(){
         }
         rewind(sign);
         while(fread(&a,sizeof(account),1,sign)){
-            
-            
             if(strcmp(useremail,a.email)==0&&strcmp(password,a.password)==0){
-                count++;
+                count=1;
+                strcpy(email,useremail);
                 printf("Login Succesfully\n");
                 break;
-
         }
-        
-        
         }
         int c;
         if(count==0){
@@ -136,13 +134,15 @@ void login(){
                     scanf("%s",newp);
                     printf("Confirm password: ");
                     scanf("%s",confp);
-                    strcpy(recovery[rec].password,confp);
                     if(strcmp(newp,confp)==0){
                         if(checkPassword(confp)==0){
                             printf("Please Use letter,UpperCase, symbols and numbers.Try Again: ");
                             goto new;
                         }
-                        
+                        else{
+                            strcpy(recovery[rec].password,confp);
+                            printf("%s\n",recovery[rec].password);
+                        }
                         }
                     } 
                     rec++;
@@ -167,18 +167,13 @@ void login(){
                 case 3:
                 Account();
                 break;
-            
             default:
             printf("Invalid option. PLease Try Again.\n");
             goto recov;
                 break;
-                }
-                
-                
-            }
-            
+                }   
+            }   
         }
-
 void signup(){
         printf("\t\tNew Account\n");
         account s;
@@ -243,12 +238,11 @@ void signup(){
             goto recovph;
         }
         fwrite(&s,sizeof(account),1,sig);
-        printf("Create Successfully.\n");
-        
+        printf("Create Successfully.\n");      
 }
-
 void Account(){
     int choice;
+    printf("\t\tVehicle Validator Management\n");
     rechoice:
     printf("1.Sign Up\t\t2.Login\n");
     printf("Enter Choice: ");
@@ -268,8 +262,19 @@ void Account(){
 }
 }
 void accountDetail(){
-    printf("\t\tAccount Detail");
-    
+    printf("\t\tAccount Detail\n\n");
+    account act;
+    FILE *acc;
+    acc=fopen("acc.txt","r");
+    while (fread(&act,sizeof(account),1,acc))
+    {
+        if(strcmp(act.email,email)==0){
+            printf("\t\tHi %s %s Your Details\n\n",act.fname,act.lname);
+            printf("Name:%s %s\n",act.fname,act.lname);
+            printf("DOB:%d/%d/%d\n",act.DOBD,act.DOBM,act.DOBY);
+            printf("Phone number:%lld\n",act.phn);
+        }
+    }  
 }
 void addVehicle(){
     vehicle v;
@@ -301,7 +306,7 @@ void addVehicle(){
                 checker=fopen("vehicle.txt","r");
                 while(fread(&check,sizeof(vehicle),1,checker)){
                     if(v.registrationNumber==check.registrationNumber){
-                        printf("The Number %d has been already registered. Please Input a Valid Number.",v.registrationNumber);
+                        printf("The Number %d has already been registered. Please Input a Valid Number.\n",v.registrationNumber);
                         goto reg;
                     }  
                 }  
@@ -317,15 +322,16 @@ void addVehicle(){
 }
 void checkVehicle(){
     int regNum;
+    int found=0;
     vehicle v;
     FILE *updatev;
     updatev=fopen("vehicle.txt","r");
     printf("Enter your Registration Number: ");
     scanf("%d",&regNum);
-    
     while (fread(&v,sizeof(vehicle),1,updatev))
     {
         if(v.registrationNumber==regNum){
+            found=1;
         printf("\t\tYour Details\n");
         printf("Registration Number:%d\n",v.registrationNumber);
         printf("Owner Name: %s %s\n",v.ofname,v.olname);
@@ -334,10 +340,9 @@ void checkVehicle(){
         printf("Model:%s\n",v.modelName);
         printf("Year of Manufacture:%d\n",v.year);
         }
-        else{
-            printf("No any vehicle Registered in this number.\n");
-            break;
-        }
+    }
+    if(found==0){
+        printf("No any vehicle Registered in this number.\n");
     }
 }
 void updateVehicle(){
@@ -351,12 +356,9 @@ void updateVehicle(){
     char oldlname[50];
     printf("Enter Your Registration Number: ");
     scanf("%d",&reg);
-    
     while (fread(&vehicles[num],sizeof(vehicle),1,upd)){
-        
         printf("%d\n",vehicles[num].registrationNumber);
         if(vehicles[num].registrationNumber==reg){
-            
             found=1;
             char omodel[100];
             change:
@@ -386,11 +388,9 @@ void updateVehicle(){
                     printf("Incorrect Name.Try Again\n");
                     goto re;
                 }
-                
                 break;
                 case 2:
                    model:           
-                
                 printf("Enter Previous Model Name: ");
                 scanf("%s",omodel);
                 if(strcmp(omodel,vehicles[num].modelName)==0){
@@ -407,18 +407,13 @@ void updateVehicle(){
                     printf("Invalid.Try Again.\n");
                     goto model;
                 }
-                break;
-               
-
-                
-            
+                break; 
             default:
             printf("Invalid option Try Again.\n");
             goto change;
                 break;
             }
-        }
-            
+        }     
         num++;
     }
     if(!found){
@@ -434,8 +429,7 @@ void updateVehicle(){
         fwrite(&vehicles[i],sizeof(vehicle),1,upd);
     }
     fclose(upd);
-    printf("Changed Successfully");
-       
+    printf("Changed Successfully"); 
     }
     void deleteVehicle(){
         FILE *delv;
@@ -460,9 +454,9 @@ void updateVehicle(){
                 if(choice=='y'){
                     num-=1;
                 }
-                // else if(choice=='n'){
-
-                // }
+                 else if(choice=='n'){
+                menu();
+                 }
                 else{
                     printf("Please Input the valid choice.\n");
                     goto del;
@@ -474,14 +468,10 @@ void updateVehicle(){
         delv=fopen("vehicle.txt","w");
         if(delv==NULL){
             printf("Error Opening File.");
-
         }
         for(int i=0;i<num;i++){
             fwrite(&vehicles[i],sizeof(vehicles),1,delv);
         }
-        
-
-
     }
 
 
