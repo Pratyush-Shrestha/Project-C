@@ -85,7 +85,7 @@ char user[50],pass[50];
 void login(){
          printf("\t\tSign in\n");
         char useremail[100],password[100];
-        int count=0;
+        int found=0;
         account a;
         FILE *sign;
         sign=fopen("acc.txt","r");
@@ -100,14 +100,14 @@ void login(){
         rewind(sign);
         while(fread(&a,sizeof(account),1,sign)){
             if(strcmp(useremail,a.email)==0&&strcmp(password,a.password)==0){
-                count=1;
+                found=1;
                 strcpy(email,useremail);
                 printf("Login Succesfully\n");
                 break;
         }
         }
         int c;
-        if(count==0){
+        if(found==0){
             printf("Incorrect email or password.\n");
             recov:
             printf("1.Forgot Password?\t\t2.Try again\n3.Cancel\n");
@@ -148,10 +148,14 @@ void login(){
                     rec++;
                 }
                 fclose(sign);
-                sign=fopen("vehicle.txt","w");
-                for(int i=0;i<rec;i++){
+                sign=fopen("acc.txt","w");
+                if(found==1){
+                    for(int i=0;i<rec;i++){
+                    printf("%s",recovery[i].fname);
                     fwrite(&recovery[i],sizeof(account),1,sign);
-                }   
+                } 
+                }
+                  
                 if(!found){
                     printf("This Recovery PH number Doesnot Exist.\n");
                     Account();
@@ -244,7 +248,7 @@ void Account(){
     int choice;
     printf("\t\tVehicle Validator Management\n");
     rechoice:
-    printf("1.Sign Up\t\t2.Login\n");
+    printf("1.Sign Up\t\t\t\t2.Login\n3.Exit");
     printf("Enter Choice: ");
     scanf("%d",&choice);
     switch (choice)
@@ -254,6 +258,9 @@ void Account(){
         break;
     case 2:
     login();
+   break;
+   case 3:
+   exit(0);
    break;
     default:
         printf("Incorrect option.Re-Enter your choice.\n");
